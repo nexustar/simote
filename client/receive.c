@@ -33,7 +33,7 @@ int receive_a_packet(int fd, AVPacket *packet)
 	int rtplen[500];
 	int i, j, n = 0, t = 0, s=0, size = 0;
 
-	// reveive a rtp package and decide 
+	// reveive a rtp package and decide which kind it is 
 	rtplen[0] = recvfrom(fd, datagram[0], (size_t)1600, 0, &caddr, &len);
 	nalu_type = datagram[0][12] & 0x1F;
 	if (nalu_type == 0x01){
