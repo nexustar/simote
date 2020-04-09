@@ -15,6 +15,7 @@ extern struct simote_now now;
 int init_render(int w, int h)
 {
 	win = SDL_CreateWindow("simote", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
+	SDL_SetWindowGrab(win, SDL_TRUE);
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 	tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
 

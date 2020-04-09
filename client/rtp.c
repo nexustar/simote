@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <libavformat/avformat.h>
-#include "receive.h"
+#include "network.h"
 
 static void add_nal_prefix(uint8_t *data);
 
@@ -24,17 +24,15 @@ int init_receive(int port)
 	return fd;
 }
 
-int receive_a_packet(int fd, AVPacket *packet)
+int receive_a_packet( AVPacket *packet)
 {
-	struct sockaddr caddr;
-	socklen_t len = sizeof(caddr);
 	uint8_t datagram[500][1600];
 	uint8_t nalu_type;
 	int rtplen[500];
 	int i, j, n = 0, t = 0, s=0, size = 0;
 
 	// reveive a rtp package and decide which kind it is 
-	rtplen[0] = recvfrom(fd, datagram[0], (size_t)1600, 0, &caddr, &len);
+	rtplen[0] = network_getudp(datagram[0]);
 	nalu_type = datagram[0][12] & 0x1F;
 	if (nalu_type == 0x01){
 		av_new_packet(packet, rtplen[0] - 12 + 4);
@@ -46,7 +44,7 @@ int receive_a_packet(int fd, AVPacket *packet)
 	else {
 		n++;
 		do{
-			rtplen[n] = recvfrom(fd, datagram[n], (size_t)1600, 0, &caddr, &len);
+			rtplen[n] = network_getudp(datagram[n]);
 			size += rtplen[n] - 12 - 2;
 			n++;
 		}while((datagram[n-1][1] & 0x80) != 0x80);
@@ -84,10 +82,6 @@ int receive_a_packet(int fd, AVPacket *packet)
 	return 0;
 }
 
-void exit_receive(int fd)
-{
-	close(fd);
-}
 static void add_nal_prefix(uint8_t *data)
 {
 	*data = 0x00;

@@ -6,7 +6,7 @@
 #include <libswscale/swscale.h>
 #include "frame.h"
 #include "decode.h"
-#include "receive.h"
+#include "rtp.h"
 
 static AVCodec *codec = NULL;
 static AVCodecContext *cctx = NULL;
@@ -35,7 +35,7 @@ int decode_loop(void *wtf)
 	int isframe;
 	
 	newframe.type = SDL_USEREVENT;
-	while((isframe = receive_a_packet(fd, &packet)) >= 0){
+	while((isframe = receive_a_packet(&packet)) >= 0){
 		avcodec_send_packet(cctx, &packet);
 		avcodec_receive_frame(cctx, now.frame_decode);
 		now.width = cctx->width;
