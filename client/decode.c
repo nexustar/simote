@@ -10,8 +10,6 @@
 
 static AVCodec *codec = NULL;
 static AVCodecContext *cctx = NULL;
-static AVFormatContext *fctx = NULL;
-//static AVPacket packet;
 static int fd;
 extern struct simote_now now;
 int init_decode(int rtp_fd)

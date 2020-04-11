@@ -21,7 +21,6 @@ static void handle_arg(int argc, char* argv[]);
 int main(int argc, char* argv[])
 {
 	SDL_Thread *decode_thread;
-	SDL_Thread *render_thread;
 	SDL_Event event;
 
 	handle_arg(argc, argv);
