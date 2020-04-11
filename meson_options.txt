@@ -1,0 +1,2 @@
+option('build_client', type: 'boolean', value: true, description: 'Build simote client')
+option('build_server', type: 'boolean', value: true, description: 'Build simote server')

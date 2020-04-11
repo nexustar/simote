@@ -2,13 +2,16 @@
 A tool to streaming desktop
 
 ```
-$ gcc client/*.c -o simote-client -lSDL2 -lavformat -lavcodec -lavutil
+$ meson build
+$ ninja -C build
 ```
 
 ```
-$  ./simote-client -l 9005 -w 1920 -h 1080
+$  ./build/client/simote-client -s xx.xx.xx.xx -p 8848 -l 9005 -w 1920 -h 1080
 ```
 
 ```
-# ./server/simote-server
+# ./server/rtp.sh &
+# ./build/server/simote-server
+
 ```
