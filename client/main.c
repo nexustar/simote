@@ -31,6 +31,7 @@ int main(int argc, char* argv[])
 	s2 = init_render(winw, winh);
 
 	decode_thread = SDL_CreateThread(decode_loop, "simote_deocode", (void *)NULL);
+	network_sendudp((uint8_t *)"svsb",4);
 
 	while(SDL_WaitEvent(&event)){
 		switch(event.type){

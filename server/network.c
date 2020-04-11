@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <libavformat/avformat.h>
 #include "network.h"
 
@@ -26,10 +27,16 @@ int init_network(int port)
 	return 0;
 }
 
-int network_getudp(uint8_t *datagram)
+int network_getudp(uint8_t *datagram, char *ip, int *port)
 {
+	int length;
 	struct sockaddr caddr;
-	return recvfrom(fd, datagram, (size_t)1600, 0, &caddr, &len);
+	struct sockaddr_in *addr;
+	length = recvfrom(fd, datagram, (size_t)1600, 0, &caddr, &len);
+	addr = (struct sockaddr_in *)&caddr;
+	strcpy(ip, inet_ntoa(addr->sin_addr));
+	*port = ntohs(addr->sin_port);
+	return length;
 }
 
 

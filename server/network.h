@@ -1,6 +1,6 @@
 int init_network(int port);
 
-int network_getudp(uint8_t *datagram);
+int network_getudp(uint8_t *datagram, char *ip, int *port);
 
 void exit_network(void);
 
