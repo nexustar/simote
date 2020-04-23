@@ -6,7 +6,7 @@
 #include "input.h"
 #include "network.h"
 
-static char width[10], height[10];
+static char width[10] = "1280", height[10] = "720", crtc_id[10] = "0";
 static void handle_arg(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	while(network_getudp(data, ip, &port) > 0){
 		if(data[0] == 's' && data[1] == 'v')	//simote video
 			if(data[2] == 's' && data[3] == 'b'){	//stream begin
-				sprintf(rtp_command,"ffmpeg -device /dev/dri/card0 -f kmsgrab -framerate 60 -i - -vf 'hwmap=derive_device=vaapi,crop=%s:%s:0:0,scale_vaapi=w=%s:h=%s:format=nv12' -c:v h264_vaapi -qp 24 -bf 0 -f rtp rtp://%s:%d &", width, height, width, height, ip, port);
+				sprintf(rtp_command,"ffmpeg -device /dev/dri/card0 -f kmsgrab -crtc_id %s -framerate 60 -i - -vf 'hwmap=derive_device=vaapi,crop=%s:%s:0:0,scale_vaapi=w=%s:h=%s:format=nv12' -c:v h264_vaapi -qp 24 -bf 0 -f rtp rtp://%s:%d &", crtc_id, width, height, width, height, ip, port);
 				system(rtp_command);
 			}
 		if(data[0] == 's' && data[1] == 'e'){	//simote even
@@ -41,13 +41,16 @@ void handle_arg(int argc, char* argv[])
 	extern char *optarg;
 	extern int optind, opterr, optopt;
 
-	while((optc = getopt(argc, argv, "w:h:")) != EOF){
+	while((optc = getopt(argc, argv, "w:h:c:")) != EOF){
 		switch(optc){
 		case 'w':
 			strcpy(width, optarg);
 			break;
 		case 'h':
 			strcpy(height, optarg);
+			break;
+		case 'c':
+			strcpy(crtc_id, optarg);
 			break;
 		}
 	}
