@@ -14,7 +14,7 @@
 
 static int winw = 1280, winh = 720;
 static int port_l, port_s;
-static int rtp_fd, s1, s2;
+static int s1, s2;
 static char server_ip[50];
 static void handle_arg(int argc, char* argv[]);
 
@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
 	handle_arg(argc, argv);
 	printf("%s", server_ip);
 	SDL_Init(SDL_INIT_VIDEO);
-	rtp_fd = init_network(server_ip, port_s, port_l);
-	s1 = init_decode(rtp_fd);
+	init_network(server_ip, port_s, port_l);
+	s1 = init_decode();
 	s2 = init_render(winw, winh);
 
 	decode_thread = SDL_CreateThread(decode_loop, "simote_deocode", (void *)NULL);

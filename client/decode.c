@@ -10,9 +10,9 @@
 
 static AVCodec *codec = NULL;
 static AVCodecContext *cctx = NULL;
-static int fd;
 extern struct simote_now now;
-int init_decode(int rtp_fd)
+
+int init_decode(void)
 {
 	codec = avcodec_find_decoder(AV_CODEC_ID_H264);
 	cctx = avcodec_alloc_context3(codec);
@@ -22,7 +22,7 @@ int init_decode(int rtp_fd)
 	now.frame_render = av_frame_alloc();
 	now.Is_Rendered = true;
 	now.Is_Previous_Rendered = false;
-	fd = rtp_fd;
+
 	return 0;
 }
 

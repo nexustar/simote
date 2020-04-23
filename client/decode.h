@@ -1,4 +1,4 @@
-int init_decode(int port);
+int init_decode(void);
 
 int decode_loop(void *wtf);
 

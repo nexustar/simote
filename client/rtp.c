@@ -1,28 +1,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <libavformat/avformat.h>
 #include "network.h"
 
 static void add_nal_prefix(uint8_t *data);
-
-int init_receive(int port)
-{
-	struct sockaddr_in serv_addr;
-	int fd;
-	bzero(&serv_addr, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htons(port);
-
-	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	bind(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-
-	return fd;
-}
 
 int receive_a_packet( AVPacket *packet)
 {
