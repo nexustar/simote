@@ -3,7 +3,6 @@
 #include <SDL2/SDL.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
 #include "frame.h"
 #include "decode.h"
 #include "rtp.h"

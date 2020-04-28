@@ -5,14 +5,13 @@
 #include <SDL2/SDL.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
 #include "frame.h"
 #include "decode.h"
 #include "render.h"
 #include "network.h"
 #include "input.h"
 
-static int winw = 1280, winh = 720;
+int winw = 1280, winh = 720;
 static int port_l, port_s;
 static int s1, s2;
 static char server_ip[50];
@@ -48,11 +47,17 @@ int main(int argc, char* argv[])
 		case SDL_KEYDOWN:
 			input_handle_keydown(event.key.keysym.sym);
 			break;
-			printf("keydown");
 		case SDL_KEYUP:
 			input_handle_keyup(event.key.keysym.sym);
-			printf("keyup %d\n", event.key.keysym.sym);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			input_handle_keydown(event.button.button);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			input_handle_keyup(event.button.button);
+			break;
 		case SDL_MOUSEMOTION:
+			input_handle_mouse_moveto(event.motion.x, event.motion.y);
 			break;
 		default :
 			break;

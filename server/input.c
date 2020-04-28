@@ -5,6 +5,7 @@
 #include <libevdev/libevdev-uinput.h>
 
 static struct libevdev_uinput *uidev;
+static int correction_x, correction_y;
 
 void send_key_down(unsigned int key)
 {
@@ -18,17 +19,51 @@ void send_key_up(unsigned int key)
 	libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
 }
 
-void init_uidev()
+void send_mouse_moveto(unsigned int x, unsigned int y)
+{
+	libevdev_uinput_write_event(uidev, EV_ABS, ABS_X, x + correction_x);
+	libevdev_uinput_write_event(uidev, EV_ABS, ABS_Y, y + correction_y);
+	libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+}
+
+
+void init_uidev(int abs_w, int abs_h, int abs_x, int abs_y)
 {
 	struct libevdev *dev;
+	struct input_absinfo absinfo_x = {
+		.value = 0,
+		.flat = 0,
+		.fuzz = 0,
+		.maximum = abs_w,
+		.minimum = 0,
+		.resolution = 0
+	};
+	struct input_absinfo absinfo_y = {
+		.value = 0,
+		.flat = 0,
+		.fuzz = 0,
+		.maximum = abs_h,
+		.minimum = 0,
+		.resolution = 0
+	};
+
+	correction_x = abs_x;
+	correction_y = abs_y;
 	dev = libevdev_new();
 	libevdev_set_name(dev, "simote virtual input");
+
+	libevdev_enable_event_type(dev, EV_ABS);
+	libevdev_enable_event_code(dev, EV_ABS, ABS_X, &absinfo_x);
+	libevdev_enable_event_code(dev, EV_ABS, ABS_Y, &absinfo_y);
 
 	libevdev_enable_event_type(dev, EV_REL);
 	libevdev_enable_event_code(dev, EV_REL, REL_X, NULL);
 	libevdev_enable_event_code(dev, EV_REL, REL_Y, NULL);
 
 	libevdev_enable_event_type(dev, EV_KEY);
+	libevdev_enable_event_code(dev, EV_KEY, BTN_LEFT, NULL);
+	libevdev_enable_event_code(dev, EV_KEY, BTN_MIDDLE, NULL);
+	libevdev_enable_event_code(dev, EV_KEY, BTN_RIGHT, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_BACKSPACE, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_TAB, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_ENTER, NULL);
@@ -124,6 +159,12 @@ void init_uidev()
 unsigned int to_linux_KEY(uint32_t sdlkey)
 {
 	switch(sdlkey){
+	case SDL_BUTTON_LEFT:
+		return BTN_LEFT;
+	case SDL_BUTTON_MIDDLE:
+		return BTN_MIDDLE;
+	case SDL_BUTTON_RIGHT:
+		return BTN_RIGHT;
 	case SDLK_BACKSPACE:
 		return KEY_BACKSPACE;
 	case SDLK_TAB:

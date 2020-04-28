@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <libavformat/avformat.h>
 
 struct simote_now {
 	AVFrame *frame_decode;
