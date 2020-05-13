@@ -1,4 +1,4 @@
-server_sources = [
+client_sources = [
   'main.c',
   'network.c',
   'rtp.c',
@@ -8,11 +8,11 @@ server_sources = [
   'input.c'
   ]
 
-server_deps = [
+client_deps = [
   dependency('sdl2'),
   dependency('libavcodec'),
   dependency('libavformat'),
   dependency('libavutil')
   ]
 
-executable('simote-client', server_sources, dependencies: server_deps, install: true)
+executable('simote-client', client_sources, dependencies: client_deps, install: true)

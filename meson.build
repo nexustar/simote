@@ -1,4 +1,4 @@
-project('simote', 'c', meson_version: '>=0.50.0')
+project('simote', 'c')
 
 if get_option('build_client')
   subdir('client')
