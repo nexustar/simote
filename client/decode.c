@@ -28,10 +28,8 @@ int init_decode(void)
 int decode_loop(void *wtf)
 {
 	AVPacket packet;
-	SDL_Event newframe;
 	int isframe;
 	
-	newframe.type = SDL_USEREVENT;
 	while((isframe = receive_a_packet(&packet)) >= 0){
 		avcodec_send_packet(cctx, &packet);
 		avcodec_receive_frame(cctx, now.frame_decode);
@@ -42,7 +40,7 @@ int decode_loop(void *wtf)
 		now.Is_Previous_Rendered = now.Is_Rendered;
 		now.Is_Rendered = false;
 		if(now.Is_Previous_Rendered)
-			SDL_PushEvent (&newframe);
+			SDL_SemPost(now.render_sem);
 		else
 			printf("skip a frame\n");
 		//av_packet_unref(&packet);

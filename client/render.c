@@ -25,6 +25,14 @@ int init_render(int w, int h)
 	return 0;
 }
 
+int render_loop(void *wtf)
+{
+	while(true){
+		SDL_SemWait(now.render_sem);
+		render_a_frame();
+	}
+}
+
 int render_a_frame(void)
 {
 	now.Is_Rendered = true;

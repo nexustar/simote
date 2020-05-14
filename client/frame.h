@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <SDL2/SDL.h>
 #include <libavformat/avformat.h>
 
 struct simote_now {
@@ -8,6 +9,7 @@ struct simote_now {
 	int height;
 	bool Is_Rendered;
 	bool Is_Previous_Rendered;
+	SDL_sem *render_sem;
 };
 
 long gct(void);

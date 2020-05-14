@@ -19,7 +19,7 @@ static void handle_arg(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
-	SDL_Thread *decode_thread;
+	SDL_Thread *decode_thread, *render_thread;
 	SDL_Event event;
 
 	handle_arg(argc, argv);
@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
 	s2 = init_render(winw, winh);
 
 	decode_thread = SDL_CreateThread(decode_loop, "simote_deocode", (void *)NULL);
+	render_thread = SDL_CreateThread(render_loop, "simote_render", (void *)NULL);
 	network_sendudp((uint8_t *)"svsb",4);
 
 	while(SDL_WaitEvent(&event)){
@@ -41,9 +42,6 @@ int main(int argc, char* argv[])
 			case SDL_WINDOWEVENT_RESIZED:
 				;
 			}
-		case SDL_USEREVENT:
-			render_a_frame();
-			break;
 		case SDL_KEYDOWN:
 			input_handle_keydown(event.key.keysym.sym);
 			break;
