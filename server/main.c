@@ -18,7 +18,9 @@ int main(int argc, char* argv[])
 
 	handle_arg(argc, argv);
 	printf("ok\n");
-	init_uidev(abs_w, abs_h, abs_x, abs_y);
+	init_absmouse(abs_w, abs_h, abs_x, abs_y);
+	init_keyboard();
+	set_mouse('a');
 	init_network(8848);
 
 	while(network_getudp(data, ip, &port) > 0){
@@ -34,6 +36,10 @@ int main(int argc, char* argv[])
 				send_key_up(to_linux_KEY(network_uint8to32(data+4)));
 			if(data[2] == 'm' && data[3] == 'a')	//mouse absolute move
 				send_mouse_moveto((data[4]<<8 | data[5]) * orgin_w / width / 4, (data[6]<<8 | data[7]) * orgin_h / height / 4);
+			if(data[2] == 'm' && data[3] == 'd')
+				send_btn_down(to_linux_KEY(network_uint8to32(data+4)));
+			if(data[2] == 'm' && data[3] == 'u')
+				send_btn_up(to_linux_KEY(network_uint8to32(data+4)));
 		}
 	}
 	return 0;

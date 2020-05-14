@@ -49,10 +49,10 @@ int main(int argc, char* argv[])
 			input_handle_keyup(event.key.keysym.sym);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			input_handle_keydown(event.button.button);
+			input_handle_btndown(event.button.button);
 			break;
 		case SDL_MOUSEBUTTONUP:
-			input_handle_keyup(event.button.button);
+			input_handle_btnup(event.button.button);
 			break;
 		case SDL_MOUSEMOTION:
 			input_handle_mouse_moveto(event.motion.x, event.motion.y);

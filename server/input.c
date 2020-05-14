@@ -4,30 +4,41 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
-static struct libevdev_uinput *uidev;
+static struct libevdev_uinput *v_keyboard, *v_absmouse, *v_relmouse, *v_mouse;
 static int correction_x, correction_y;
 
 void send_key_down(unsigned int key)
 {
-	libevdev_uinput_write_event(uidev, EV_KEY, key, 1);
-	libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+	libevdev_uinput_write_event(v_keyboard, EV_KEY, key, 1);
+	libevdev_uinput_write_event(v_keyboard, EV_SYN, SYN_REPORT, 0);
 }
 
 void send_key_up(unsigned int key)
 {
-	libevdev_uinput_write_event(uidev, EV_KEY, key, 0);
-	libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+	libevdev_uinput_write_event(v_keyboard, EV_KEY, key, 0);
+	libevdev_uinput_write_event(v_keyboard, EV_SYN, SYN_REPORT, 0);
+}
+
+void send_btn_down(unsigned int key)
+{
+	libevdev_uinput_write_event(v_mouse, EV_KEY, key, 1);
+	libevdev_uinput_write_event(v_mouse, EV_SYN, SYN_REPORT, 0);
+}
+
+void send_btn_up(unsigned int key)
+{
+	libevdev_uinput_write_event(v_mouse, EV_KEY, key, 0);
+	libevdev_uinput_write_event(v_mouse, EV_SYN, SYN_REPORT, 0);
 }
 
 void send_mouse_moveto(unsigned int x, unsigned int y)
 {
-	libevdev_uinput_write_event(uidev, EV_ABS, ABS_X, x + correction_x);
-	libevdev_uinput_write_event(uidev, EV_ABS, ABS_Y, y + correction_y);
-	libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+	libevdev_uinput_write_event(v_absmouse, EV_ABS, ABS_X, x + correction_x);
+	libevdev_uinput_write_event(v_absmouse, EV_ABS, ABS_Y, y + correction_y);
+	libevdev_uinput_write_event(v_absmouse, EV_SYN, SYN_REPORT, 0);
 }
 
-
-void init_uidev(int abs_w, int abs_h, int abs_x, int abs_y)
+void init_absmouse(int abs_w, int abs_h, int abs_x, int abs_y)
 {
 	struct libevdev *dev;
 	struct input_absinfo absinfo_x = {
@@ -50,11 +61,25 @@ void init_uidev(int abs_w, int abs_h, int abs_x, int abs_y)
 	correction_x = abs_x;
 	correction_y = abs_y;
 	dev = libevdev_new();
-	libevdev_set_name(dev, "simote virtual input");
+	libevdev_set_name(dev, "simote absolution mouse");
 
 	libevdev_enable_event_type(dev, EV_ABS);
 	libevdev_enable_event_code(dev, EV_ABS, ABS_X, &absinfo_x);
 	libevdev_enable_event_code(dev, EV_ABS, ABS_Y, &absinfo_y);
+
+	libevdev_enable_event_type(dev, EV_KEY);
+	libevdev_enable_event_code(dev, EV_KEY, BTN_LEFT, NULL);
+	libevdev_enable_event_code(dev, EV_KEY, BTN_MIDDLE, NULL);
+	libevdev_enable_event_code(dev, EV_KEY, BTN_RIGHT, NULL);
+
+	libevdev_uinput_create_from_device(dev, LIBEVDEV_UINPUT_OPEN_MANAGED, &v_absmouse);
+}
+
+void init_relmouse(void)
+{
+	struct libevdev *dev;
+	dev = libevdev_new();
+	libevdev_set_name(dev, "simote relative mouse");
 
 	libevdev_enable_event_type(dev, EV_REL);
 	libevdev_enable_event_code(dev, EV_REL, REL_X, NULL);
@@ -64,6 +89,17 @@ void init_uidev(int abs_w, int abs_h, int abs_x, int abs_y)
 	libevdev_enable_event_code(dev, EV_KEY, BTN_LEFT, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, BTN_MIDDLE, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, BTN_RIGHT, NULL);
+
+	libevdev_uinput_create_from_device(dev, LIBEVDEV_UINPUT_OPEN_MANAGED, &v_relmouse);
+}
+
+void init_keyboard(void)
+{
+	struct libevdev *dev;
+	dev = libevdev_new();
+	libevdev_set_name(dev, "simote keyboard");
+
+	libevdev_enable_event_type(dev, EV_KEY);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_BACKSPACE, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_TAB, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_ENTER, NULL);
@@ -152,8 +188,16 @@ void init_uidev(int abs_w, int abs_h, int abs_x, int abs_y)
 	libevdev_enable_event_code(dev, EV_KEY, KEY_RIGHTALT, NULL);
 	libevdev_enable_event_code(dev, EV_KEY, KEY_RIGHTMETA, NULL);
 
-	libevdev_uinput_create_from_device(dev, LIBEVDEV_UINPUT_OPEN_MANAGED, &uidev);
+	libevdev_uinput_create_from_device(dev, LIBEVDEV_UINPUT_OPEN_MANAGED, &v_keyboard);
 
+}
+
+void set_mouse(char mouse)
+{
+	if(mouse == 'a')
+		v_mouse = v_absmouse;
+	else if(mouse == 'r')
+		v_mouse = v_relmouse;
 }
 
 unsigned int to_linux_KEY(uint32_t sdlkey)
