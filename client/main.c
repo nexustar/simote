@@ -21,13 +21,15 @@ int main(int argc, char* argv[])
 {
 	SDL_Thread *decode_thread, *render_thread;
 	SDL_Event event;
+	SDL_Window *win = NULL;
 
 	handle_arg(argc, argv);
-	printf("%s", server_ip);
 	SDL_Init(SDL_INIT_VIDEO);
+	win = SDL_CreateWindow("simote", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, winw, winh, SDL_WINDOW_RESIZABLE);
+	SDL_SetWindowGrab(win, SDL_TRUE);
 	init_network(server_ip, port_s, port_l);
 	s1 = init_decode();
-	s2 = init_render(winw, winh);
+	s2 = init_render(win, winw, winh);
 
 	decode_thread = SDL_CreateThread(decode_loop, "simote_deocode", (void *)NULL);
 	render_thread = SDL_CreateThread(render_loop, "simote_render", (void *)NULL);
@@ -38,10 +40,12 @@ int main(int argc, char* argv[])
 		case SDL_QUIT:
 			SDL_Quit();
 		case SDL_WINDOWEVENT:
-			switch(event.window.type){
-			case SDL_WINDOWEVENT_RESIZED:
-				;
+			switch(event.window.event){
+			case SDL_WINDOWEVENT_SIZE_CHANGED:
+				winw = event.window.data1;
+				winh = event.window.data2;
 			}
+			break;
 		case SDL_KEYDOWN:
 			input_handle_keydown(event.key.keysym.sym);
 			break;
