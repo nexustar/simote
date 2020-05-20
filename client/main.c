@@ -9,6 +9,7 @@
 #include "decode.h"
 #include "render.h"
 #include "network.h"
+#include "rtp.h"
 #include "input.h"
 
 int winw = 1280, winh = 720;
@@ -19,7 +20,7 @@ static void handle_arg(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
-	SDL_Thread *decode_thread, *render_thread;
+	SDL_Thread *rtp_thread, *decode_thread, *render_thread;
 	SDL_Event event;
 	SDL_Window *win = NULL;
 
@@ -31,6 +32,7 @@ int main(int argc, char* argv[])
 	s1 = init_decode();
 	s2 = init_render(win, winw, winh);
 
+	rtp_thread = SDL_CreateThread(rtp_loop, "simote_network", (void *)NULL);
 	decode_thread = SDL_CreateThread(decode_loop, "simote_deocode", (void *)NULL);
 	render_thread = SDL_CreateThread(render_loop, "simote_render", (void *)NULL);
 	network_sendudp((uint8_t *)"svsb",4);

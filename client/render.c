@@ -12,6 +12,9 @@ extern struct simote_now now;
 
 int init_render(SDL_Window *win, int w, int h)
 {
+	now.render_sem = SDL_CreateSemaphore(1);
+	SDL_SemWait(now.render_sem);
+
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 	tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, w, h);
 

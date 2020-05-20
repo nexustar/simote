@@ -9,6 +9,7 @@ struct simote_now {
 	int height;
 	bool Is_Rendered;
 	bool Is_Previous_Rendered;
+	SDL_sem *decode_sem;
 	SDL_sem *render_sem;
 };
 

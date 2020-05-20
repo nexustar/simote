@@ -13,6 +13,9 @@ extern struct simote_now now;
 
 int init_decode(void)
 {
+	now.decode_sem = SDL_CreateSemaphore(1);
+	SDL_SemWait(now.decode_sem);
+
 	codec = avcodec_find_decoder(AV_CODEC_ID_H264);
 	cctx = avcodec_alloc_context3(codec);
 
@@ -30,7 +33,9 @@ int decode_loop(void *wtf)
 	AVPacket packet;
 	int isframe;
 	
-	while((isframe = receive_a_packet(&packet)) >= 0){
+	while(true){
+		SDL_SemWait(now.decode_sem);
+		isframe = receive_a_packet(&packet);
 		avcodec_send_packet(cctx, &packet);
 		avcodec_receive_frame(cctx, now.frame_decode);
 		now.width = cctx->width;
