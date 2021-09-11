@@ -23,7 +23,6 @@ int init_decode(void)
 	now.frame_decode = av_frame_alloc();
 	now.frame_render = av_frame_alloc();
 	now.Is_Rendered = true;
-	now.Is_Previous_Rendered = false;
 
 	return 0;
 }
@@ -41,13 +40,16 @@ int decode_loop(void *wtf)
 		now.width = cctx->width;
 		now.height = cctx->height;
 
-		frame_swap(&now.frame_decode, &now.frame_render);
-		now.Is_Previous_Rendered = now.Is_Rendered;
-		now.Is_Rendered = false;
-		if(now.Is_Previous_Rendered)
+		SDL_LockMutex(now.mutex);
+		if(now.Is_Rendered) {
+			frame_swap(&now.frame_decode, &now.frame_render);
 			SDL_SemPost(now.render_sem);
-		else
+			SDL_UnlockMutex(now.mutex);
+		} else {
+			SDL_UnlockMutex(now.mutex);
 			printf("skip a frame\n");
+		}
+
 		//av_packet_unref(&packet);
 		free(packet.data);
 		free(packet.buf);

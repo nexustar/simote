@@ -8,9 +8,9 @@ struct simote_now {
 	int width;
 	int height;
 	bool Is_Rendered;
-	bool Is_Previous_Rendered;
 	SDL_sem *decode_sem;
 	SDL_sem *render_sem;
+	SDL_mutex *mutex;
 };
 
 long gct(void);

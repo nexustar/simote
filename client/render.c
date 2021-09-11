@@ -4,6 +4,7 @@
 #include <libavformat/avformat.h>
 #include "frame.h"
 #include "render.h"
+#include <unistd.h>
 
 static SDL_Renderer *ren = NULL;
 static SDL_Texture *tex = NULL;
@@ -35,16 +36,20 @@ int render_loop(void *wtf)
 
 int render_a_frame(void)
 {
-	now.Is_Rendered = true;
 	AVFrame *frame = NULL;
+	SDL_LockMutex(now.mutex);
 	frame = now.frame_render;
-       	if(rect.w != now.width || rect.h != now.height){
+	now.Is_Rendered = false;
+	SDL_UnlockMutex(now.mutex);
+    if(rect.w != now.width || rect.h != now.height){
 		printf("%d %d\n%d %d\n", rect.w, rect.h, now.width, now.height);
 		SDL_DestroyTexture(tex);
 		rect.w = now.width;
 		rect.h = now.height;
 		tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, rect.w, rect.h);
 	}
+
+	usleep(500*1000);
 	SDL_UpdateYUVTexture(tex, NULL,
 	                     frame->data[0], frame->linesize[0],
 			     frame->data[1], frame->linesize[1],
@@ -52,5 +57,8 @@ int render_a_frame(void)
 	SDL_RenderClear(ren);
 	SDL_RenderCopy(ren, tex, NULL, NULL);
 	SDL_RenderPresent(ren);
+	SDL_LockMutex(now.mutex);
+	now.Is_Rendered = true;
+	SDL_UnlockMutex(now.mutex);
 	return 0;
 }
